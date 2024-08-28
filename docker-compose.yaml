@@ -1,16 +1,98 @@
-version: '3.8'
 services:
+
+  #  Book Service
+  db-book:
+    container_name: db-book-services
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - sale-store-network
+    volumes:
+      - db-book-service:/data/db
+
+  book-service:
+    container_name: book-service
+    build:
+      context: ./book-service
+      dockerfile: Dockerfile
+    image: book-service:latest
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./book-service/.env.production
+    networks:
+      - sale-store-network
+    depends_on:
+      - db-book
+
+  #  Sale Service
+  db-sale:
+    container_name: db-sale-service
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=sale_service
+      - MYSQL_USER=admin
+      - MYSQL_ROOT_PASSWORD=admin
+      - MYSQL_PASSWORD=admin
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./sale-service/docker/mysql/conf.d:/etc/mysql/conf.d
+      - db-sale-service:/var/lib/mysql
+    networks:
+      - sale-store-network
+
   sale-service:
-    - container_name: sale-service
-    - extends:
-        file: common-services.yaml
-        service: sale-service
-networks:
-    book-store:
-      driver: bridge
+    container_name: backend-sale-service
+    build:
+      context: ./sale-service
+      dockerfile: Dockerfile
+    image: sale-service:latest
+    entrypoint: [ "./sale-service/docker/entrypoint.sh" ]
+    ports:
+      - "9000:80"
+    depends_on:
+      db-sale:
+        condition: service_healthy
+    environment:
+      - APP_ENV=production
+      - DB_CONNECTION=mysql
+      - DB_HOST=db-sale
+      - DB_PORT=3306
+      - DB_DATABASE=sale_service
+      - DB_USERNAME=admin
+      - DB_PASSWORD=admin
+    working_dir: /var/www/sale-service
+    volumes:
+      - ./sale-service/docker/php/php.ini:/usr/local/etc/php/php.ini
+      - .:/var/www/sale-service
+    networks:
+      - sale-store-network
+
+  # Nginx Configuration
+  nginx:
+    container_name: nginx-sale-service
+    image: nginx:latest
+    volumes:
+      - ./sale-service/docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - .:/var/www/sale-service
+    ports:
+      - "80:80"
+    depends_on:
+      - sale-service
+    networks:
+      - sale-store-network
 
 volumes:
-  mysql_db:
-  postgres_db:
-  mongo_db:
-  rabbitmq_db:
+  db-sale-service:
+  db-book-service:
+
+networks:
+  sale-store-network:
+    driver: bridge
