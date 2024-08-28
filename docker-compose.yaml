@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  sale-service:
+    - container_name: sale-service
+    - extends:
+        file: common-services.yaml
+        service: sale-service
+networks:
+    book-store:
+      driver: bridge
+
+volumes:
+  mysql_db:
+  postgres_db:
+  mongo_db:
+  rabbitmq_db:
