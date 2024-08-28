@@ -12,19 +12,17 @@ services:
       - db-book-service:/data/db
 
   book-service:
-    container_name: book-service
+    container_name: backend-book-service
     build:
       context: ./book-service
       dockerfile: Dockerfile
     image: book-service:latest
-    ports:
-      - "3000:3000"
-    env_file:
-      - ./book-service/.env.production
-    networks:
-      - sale-store-network
     depends_on:
       - db-book
+    ports:
+      - "3000:3000"
+    networks:
+      - sale-store-network
 
   #  Sale Service
   db-sale:

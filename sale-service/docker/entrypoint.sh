@@ -9,7 +9,7 @@ if [ ! -f "vendor/autoload.php" ]; then
 fi
 
 if [ ! -f ".env.production" ]; then
-    cp .env.example .env.prod
+    cp .env.example .env.production
     echo "Copying .env.example to .env.production"
 fi
 
