@@ -26,14 +26,14 @@ RUN apt-get update && apt-get install -y unzip libpq-dev libcurl4-gnutls-dev ngi
 RUN docker-php-ext-install mysqli pdo pdo_mysql bcmath curl opcache mbstring
 
 # Copy existing application directory contents
-COPY . /var/www/sale-service
+COPY . /var/www/BookStore/sale-service
 
 # Set permissions in a separate step
-RUN chown -R www-data:www-data /var/www/sale-service \
-    && chmod -R 755 /var/www/sale-service
+RUN chown -R www-data:www-data /var/www/BookStore/sale-service \
+    && chmod -R 755 /var/www/BookStore/sale-service
 
 # Set working directory
-WORKDIR /var/www/sale-service
+WORKDIR /var/www/BookStore/sale-service
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -45,5 +45,3 @@ COPY ./docker/nginx/nginx.conf /etc/nginx/nginx.conf
 
 # Run entrypoint script
 RUN ["chmod", "+x", "docker/entrypoint.sh"]
-
-ENTRYPOINT ["docker/entrypoint.sh" ]
