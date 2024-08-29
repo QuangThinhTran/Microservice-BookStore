@@ -7,8 +7,7 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class BookService {
-  constructor(@InjectModel(Book.name) private bookModel: Model<Book>) {
-  }
+  constructor(@InjectModel(Book.name) private bookModel: Model<Book>) {}
 
   /**
    * Create a new book
@@ -63,7 +62,7 @@ export class BookService {
    * @param code
    * */
   async checkCodeExist(code: string): Promise<boolean> {
-    let checkExist = this.bookModel.findOne({ code }).exec();
+    const checkExist = this.bookModel.findOne({ code }).exec();
     return !!checkExist;
   }
 }

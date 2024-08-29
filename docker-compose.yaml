@@ -21,6 +21,8 @@ services:
       - db-book
     ports:
       - "3000:3000"
+    environment:
+      - DB_URL=mongodb://db-book:27017/book_service
     networks:
       - sale-store-network
 
@@ -87,9 +89,24 @@ services:
     networks:
       - sale-store-network
 
+  rabbitmq:
+    container_name: rabbitmq-service
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - sale-store-network
+
 volumes:
   db-sale-service:
   db-book-service:
+  rabbitmq-data:
 
 networks:
   sale-store-network:

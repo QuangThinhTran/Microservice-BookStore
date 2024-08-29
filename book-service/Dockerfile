@@ -1,5 +1,5 @@
 # Stage 1: Build the NestJS application
-FROM node:20.16.0-alpine as build
+FROM node:20.16.0-alpine
 
 # Set the working directory
 WORKDIR /usr/src/app

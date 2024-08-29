@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, Res, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+  Res,
+  HttpStatus,
+} from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -26,23 +36,27 @@ export class CategoryController extends ApiController {
     @Res() res: Response,
   ): Promise<void> {
     try {
-      let checkExist = await this.categoryService.checkNameExist(createCategoryDto.name);
+      const checkExist = await this.categoryService.checkNameExist(
+        createCategoryDto.name,
+      );
       if (!checkExist) {
-        this.responseMessage(HttpStatus.BAD_REQUEST, 'Category already exist', res);
-        return;
+        return this.responseMessage(
+          HttpStatus.BAD_REQUEST,
+          'Category already exist',
+          res,
+        );
       }
 
-      let category = await this.categoryService.create(createCategoryDto);
+      const category = await this.categoryService.create(createCategoryDto);
 
-      this.responseDataAndMessage(
+      return this.responseDataAndMessage(
         HttpStatus.CREATED,
         'Category created',
         this.categoryMapped.mappedCategory(category),
         res,
       );
-
     } catch (e) {
-      this.responseException(e.message, res);
+      return this.responseException(e.message, res);
     }
   }
 
@@ -53,10 +67,14 @@ export class CategoryController extends ApiController {
   @Get()
   async findAll(@Res() res: Response): Promise<void> {
     try {
-      let categories = await this.categoryService.findAll();
-      this.responseData(HttpStatus.OK, this.categoryMapped.mappedCategories(categories), res);
+      const categories = await this.categoryService.findAll();
+      return this.responseData(
+        HttpStatus.OK,
+        this.categoryMapped.mappedCategories(categories),
+        res,
+      );
     } catch (e) {
-      this.responseException(e.message, res);
+      return this.responseException(e.message, res);
     }
   }
 
@@ -71,15 +89,22 @@ export class CategoryController extends ApiController {
     @Res() res: Response,
   ): Promise<void> {
     try {
-      let category = await this.categoryService.findOne(name);
+      const category = await this.categoryService.findOne(name);
       if (!category) {
-        this.responseMessage(HttpStatus.NOT_FOUND, 'Category not found', res);
-        return;
+        return this.responseMessage(
+          HttpStatus.NOT_FOUND,
+          'Category not found',
+          res,
+        );
       }
 
-      this.responseData(HttpStatus.OK, this.categoryMapped.mappedCategoryDetailWithBook(category), res);
+      return this.responseData(
+        HttpStatus.OK,
+        this.categoryMapped.mappedCategoryDetailWithBook(category),
+        res,
+      );
     } catch (e) {
-      this.responseException(e.message, res);
+      return this.responseException(e.message, res);
     }
   }
 
@@ -96,22 +121,31 @@ export class CategoryController extends ApiController {
     @Res() res: Response,
   ): Promise<void> {
     try {
-      let checkExist = await this.categoryService.checkNameExist(UpdateCategoryDto.name);
+      const checkExist = await this.categoryService.checkNameExist(
+        UpdateCategoryDto.name,
+      );
       if (!checkExist) {
-        this.responseMessage(HttpStatus.BAD_REQUEST, 'Category already exist', res);
-        return;
+        return this.responseMessage(
+          HttpStatus.BAD_REQUEST,
+          'Category already exist',
+          res,
+        );
       }
 
-      let category = await this.categoryService.findOne(name);
+      const category = await this.categoryService.findOne(name);
       if (!category) {
-        this.responseMessage(HttpStatus.NOT_FOUND, 'Category not found', res);
+        return this.responseMessage(
+          HttpStatus.NOT_FOUND,
+          'Category not found',
+          res,
+        );
       }
 
       await this.categoryService.update(name, updateCategoryDto);
 
-      this.responseMessage(HttpStatus.OK, 'Category updated', res);
+      return this.responseMessage(HttpStatus.OK, 'Category updated', res);
     } catch (e) {
-      this.responseException(e.message, res);
+      return this.responseException(e.message, res);
     }
   }
 
@@ -126,17 +160,20 @@ export class CategoryController extends ApiController {
     @Res() res: Response,
   ): Promise<void> {
     try {
-      let category = await this.categoryService.findOne(name);
+      const category = await this.categoryService.findOne(name);
       if (!category) {
-        this.responseMessage(HttpStatus.NOT_FOUND, 'Category not found', res);
-        return;
+        return this.responseMessage(
+          HttpStatus.NOT_FOUND,
+          'Category not found',
+          res,
+        );
       }
 
       await this.categoryService.remove(name);
 
-      this.responseMessage(HttpStatus.OK, 'Category deleted', res);
+      return this.responseMessage(HttpStatus.OK, 'Category deleted', res);
     } catch (e) {
-      this.responseException(e.message, res);
+      return this.responseException(e.message, res);
     }
   }
 }

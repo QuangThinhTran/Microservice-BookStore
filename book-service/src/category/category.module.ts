@@ -10,11 +10,12 @@ import { Book, BookSchema } from '../book/schema/book.schema';
 @Module({
   controllers: [CategoryController],
   providers: [CategoryService, CategoryMapped, BookService],
-  imports: [MongooseModule.forFeature([
-    { name: Book.name, schema: BookSchema },
-    { name: 'Category', schema: CategorySchema },
-  ])],
+  imports: [
+    MongooseModule.forFeature([
+      { name: Book.name, schema: BookSchema },
+      { name: 'Category', schema: CategorySchema },
+    ]),
+  ],
   exports: [CategoryService],
 })
-export class CategoryModule {
-}
+export class CategoryModule {}

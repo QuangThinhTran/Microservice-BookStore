@@ -10,8 +10,7 @@ export class CategoryService {
   constructor(
     @InjectModel(Category.name)
     private categoryModel: mongoose.Model<Category>,
-  ) {
-  }
+  ) {}
 
   /**
    * Create category
@@ -49,8 +48,13 @@ export class CategoryService {
    * @param name
    * @param updateCategoryDto
    * */
-  async update(name: string, updateCategoryDto: UpdateCategoryDto): Promise<Category> {
-    return this.categoryModel.findOneAndUpdate({ name }, updateCategoryDto).exec();
+  async update(
+    name: string,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<Category> {
+    return this.categoryModel
+      .findOneAndUpdate({ name }, updateCategoryDto)
+      .exec();
   }
 
   /**
@@ -66,7 +70,7 @@ export class CategoryService {
    * @param name
    * */
   async checkNameExist(name: string): Promise<boolean> {
-    let checkExist = this.categoryModel.findOne({ name }).exec();
+    const checkExist = this.categoryModel.findOne({ name }).exec();
     return !!checkExist;
   }
 }

@@ -2,10 +2,7 @@ import { Category } from './schema/category.schema';
 import { BookService } from '../book/book.service';
 
 export class CategoryMapped {
-  constructor(
-    private readonly bookService: BookService,
-  ) {
-  }
+  constructor(private readonly bookService: BookService) {}
 
   /**
    * Mapped category
@@ -24,7 +21,7 @@ export class CategoryMapped {
   mappedCategoryDetailWithBook(data: Category) {
     return {
       name: data.name,
-      books: data.books.map(book => {
+      books: data.books.map((book) => {
         return {
           title: book.name,
           description: book.description,
@@ -39,7 +36,7 @@ export class CategoryMapped {
    * @param data
    * */
   mappedCategories(data: Category[]) {
-    return data.map(category => {
+    return data.map((category) => {
       return {
         name: category.name,
       };

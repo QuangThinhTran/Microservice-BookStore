@@ -4,10 +4,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class BookMapped {
-  constructor(
-    readonly categoryService: CategoryService,
-  ) {
-  }
+  constructor(readonly categoryService: CategoryService) {}
 
   /**
    * Map book to readable format
@@ -19,7 +16,9 @@ export class BookMapped {
       name: book.name,
       price: book.price,
       description: book.description,
-      category: await this.categoryService.findById(book.category.id).then(category => category.name),
+      category: await this.categoryService
+        .findById(book.category.id)
+        .then((category) => category.name),
     };
   }
 
@@ -28,15 +27,17 @@ export class BookMapped {
    * @param books
    * */
   async mappedBooks(books: Book[]) {
-    return await Promise.all(books.map(async book => {
-      const category = await this.categoryService.findById(book.category.id);
-      return {
-        code: book.code,
-        name: book.name,
-        price: book.price,
-        description: book.description,
-        category: category.name,
-      };
-    }));
+    return await Promise.all(
+      books.map(async (book) => {
+        const category = await this.categoryService.findById(book.category.id);
+        return {
+          code: book.code,
+          name: book.name,
+          price: book.price,
+          description: book.description,
+          category: category.name,
+        };
+      }),
+    );
   }
 }

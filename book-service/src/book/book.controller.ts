@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, Res, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+  Res,
+  HttpStatus,
+} from '@nestjs/common';
 import { BookService } from './book.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
@@ -26,22 +36,26 @@ export class BookController extends ApiController {
     @Res() res: Response,
   ): Promise<void> {
     try {
-      let checkExist = await this.bookService.checkCodeExist(createBookDto.code);
-      if (!checkExist) {
-        this.responseMessage(HttpStatus.BAD_REQUEST, 'Book already exist', res);
-        return;
+      const exists = await this.bookService.checkCodeExist(createBookDto.code);
+      if (exists) {
+        return this.responseMessage(
+          HttpStatus.CONFLICT,
+          'Book already exists',
+          res,
+        );
       }
 
-      let book = await this.bookService.create(createBookDto);
+      const book = await this.bookService.create(createBookDto);
+      const mappedBook = await this.bookMapped.mappedBook(book);
 
-      this.responseDataAndMessage(
+      return this.responseDataAndMessage(
         HttpStatus.CREATED,
         'Book created',
-        await this.bookMapped.mappedBook(book),
+        mappedBook,
         res,
       );
-    } catch (e) {
-      this.responseException(e.message, res);
+    } catch (error) {
+      return this.responseException(error.message, res);
     }
   }
 
@@ -52,10 +66,14 @@ export class BookController extends ApiController {
   @Get()
   async findAll(@Res() res: Response): Promise<void> {
     try {
-      let books = await this.bookService.findAll();
-      this.responseData(HttpStatus.OK, await this.bookMapped.mappedBooks(books), res);
+      const books = await this.bookService.findAll();
+      return this.responseData(
+        HttpStatus.OK,
+        await this.bookMapped.mappedBooks(books),
+        res,
+      );
     } catch (e) {
-      this.responseException(e.message, res);
+      return this.responseException(e.message, res);
     }
   }
 
@@ -70,15 +88,22 @@ export class BookController extends ApiController {
     @Res() res: Response,
   ): Promise<void> {
     try {
-      let book = await this.bookService.findOne(code);
+      const book = await this.bookService.findOne(code);
       if (!book) {
-        this.responseMessage(HttpStatus.NOT_FOUND, 'Book not found', res);
-        return;
+        return this.responseMessage(
+          HttpStatus.NOT_FOUND,
+          'Book not found',
+          res,
+        );
       }
 
-      this.responseData(HttpStatus.OK, await this.bookMapped.mappedBook(book), res);
+      return this.responseData(
+        HttpStatus.OK,
+        await this.bookMapped.mappedBook(book),
+        res,
+      );
     } catch (e) {
-      this.responseException(e.message, res);
+      return this.responseException(e.message, res);
     }
   }
 
@@ -90,27 +115,34 @@ export class BookController extends ApiController {
    * */
   @Put('/update/:code')
   async update(
-    @Param('code') code: string, @Body() updateBookDto: UpdateBookDto,
+    @Param('code') code: string,
+    @Body() updateBookDto: UpdateBookDto,
     @Res() res: Response,
   ): Promise<void> {
     try {
-      let checkExist = await this.bookService.checkCodeExist(code);
+      const checkExist = await this.bookService.checkCodeExist(code);
       if (!checkExist) {
-        this.responseMessage(HttpStatus.BAD_REQUEST, 'Book already exist', res);
-        return;
+        return this.responseMessage(
+          HttpStatus.BAD_REQUEST,
+          'Book already exist',
+          res,
+        );
       }
 
-      let book = await this.bookService.findOne(code);
+      const book = await this.bookService.findOne(code);
       if (!book) {
-        this.responseMessage(HttpStatus.NOT_FOUND, 'Book not found', res);
-        return;
+        return this.responseMessage(
+          HttpStatus.NOT_FOUND,
+          'Book not found',
+          res,
+        );
       }
 
       await this.bookService.update(code, updateBookDto);
 
-      this.responseMessage(HttpStatus.OK, 'Book updated', res);
+      return this.responseMessage(HttpStatus.OK, 'Book updated', res);
     } catch (e) {
-      this.responseException(e.message, res);
+      return this.responseException(e.message, res);
     }
   }
 
@@ -125,17 +157,20 @@ export class BookController extends ApiController {
     @Res() res: Response,
   ): Promise<void> {
     try {
-      let book = await this.bookService.findOne(code);
+      const book = await this.bookService.findOne(code);
       if (!book) {
-        this.responseMessage(HttpStatus.NOT_FOUND, 'Book not found', res);
-        return;
+        return this.responseMessage(
+          HttpStatus.NOT_FOUND,
+          'Book not found',
+          res,
+        );
       }
 
       await this.bookService.remove(code);
 
-      this.responseMessage(HttpStatus.OK, 'Book deleted', res);
+      return this.responseMessage(HttpStatus.OK, 'Book deleted', res);
     } catch (e) {
-      this.responseException(e.message, res);
+      return this.responseException(e.message, res);
     }
   }
 }
